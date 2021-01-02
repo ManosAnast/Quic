@@ -1,0 +1,45 @@
+# include <stdio.h>
+# include <stdlib.h>
+# include <fcntl.h>
+# include <unistd.h>
+# include <sys/types.h>
+# include <sys/stat.h>
+# include <string.h>
+# define nullstring " "
+
+
+/* It makes a deepcopy of the source to the destination, which means that copies the cp -r command.
+ * At the end it closes the files.
+ * 
+ * src_fd: source file descriptor.
+ * dst: destination path.
+ *
+ * Return:
+ *      In case of success it returns the dst_fd.
+ *      In case of something going wrong it returns -1
+*/
+int DeepCopy(int src_fd, char * dst);
+
+
+/* It copies all the content of the source to the destination path.
+ *
+ * src_fd: source file descriptor.
+ * dst_fd: destination file descriptor.
+ *
+ * Return:
+ *      In case of success it returns the 0.
+ *      In case of something going wrong it returns -1
+*/
+int Copy(int src_fd, int dst_fd);
+
+
+/* It adds to the destination path the file that needs to be created, in order to copy to it the source file.
+ *
+ * src: source file path.
+ * dst: destination file path.
+ *
+ * Return:
+ *      In case of success it returns the new destination path.
+ *      In case of something going wrong it returns nullstring.
+*/
+char * PathMaker(char * src, char * dst);

@@ -4,11 +4,20 @@
 
 int main(int argc, char * argv[])
 {
+    char * dst=argv[argc-1];
+    char * src=argv[argc-2];
+
     //I need to do read and write implementation
-    int src_fd=open(argv[argc-2], O_RDONLY), dst_fd=open(argv[argc-1], O_WRONLY);
+    int src_fd=open(src, O_RDONLY), dst_fd=open(dst, O_WRONLY);
+
+    // DIR * dir= opendir(dst);
+    // if (errno == ENOENT){
+        
+    // }
+    
 
     if(dst_fd == -1){
-        dst_fd=DeepCopy(src_fd, PathMaker(argv[argc-2], argv[argc-1]));
+        dst_fd=DeepCopy(src_fd, src, dst);
     }
     else{
         //Here we are coping the files that are not copied

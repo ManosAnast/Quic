@@ -5,6 +5,8 @@
 # include <sys/types.h>
 # include <sys/stat.h>
 # include <string.h>
+# include <dirent.h>
+# include <errno.h>
 # define nullstring " "
 
 
@@ -12,13 +14,14 @@
  * At the end it closes the files.
  * 
  * src_fd: source file descriptor.
+ * src: source path.
  * dst: destination path.
  *
  * Return:
  *      In case of success it returns the dst_fd.
  *      In case of something going wrong it returns -1
 */
-int DeepCopy(int src_fd, char * dst);
+int DeepCopy(int src_fd, char * src, char * dst);
 
 
 /* It copies all the content of the source to the destination path.

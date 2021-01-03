@@ -1,12 +1,24 @@
 # include "Header.h"
 
-int DeepCopy(int src_fd, char * dst)
+int DeepCopy(int src_fd, char * src, char * dst)
 {
+    
+    // Check if the destination as given exists. If it doesn't create it 
+    // and add the last part of the source path, which is the file.
+    DIR * dir= opendir(dst);
+    if (errno == ENOENT){
+        mkdir(dst, 0700);
+    }
+    dst=PathMaker(src,dst);
+
+    //Create the file at the destination path
     int dst_fd=creat(dst, S_IRWXU);
     if (dst_fd == -1){
         perror("DeepCopy"); return dst_fd;
     }
 
+    // Copy the content of the source path to the destination path
+    // and then close them
     if (Copy(src_fd, dst_fd) == -1){
         return -1;
     }

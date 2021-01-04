@@ -10,17 +10,38 @@ int DeepCopy(int src_fd, char * src, char * dst)
 
     //Create the file at the destination path
     int dst_fd=creat(dst, S_IRWXU);
-    if (dst_fd == -1){
-        perror("DeepCopy"); return dst_fd;
-    }
+    // if (dst_fd == -1){
+    //     perror("DeepCopy"); return dst_fd;
+    // }
 
     // Copy the content of the source path to the destination path
-    if (Copy(src_fd, dst_fd) == -1){
+    if (CopyFiles(src_fd, src, dst, opendir(src)) == -1){
         return -1;
     }
     close(src_fd); close(dst_fd);
 
-    return dst_fd;
+    return 0;
+}
+
+int CopyFiles(int src_fd, char * src, char * dst, DIR * dir)
+{
+    if(dir == NULL){
+        perror("CopyFile"); return -1;
+    }
+
+    struct dirent * ent;
+    char * string = (char *)calloc(strlen(src), sizeof(char));
+    int counter=0;
+    // Here the string doesn't work as it should.
+    while ( (ent = readdir(dir)) != NULL){
+        printf("%s\n",ent->d_name);
+        int dst_fd=creat(strcat(dst, ent->d_name), S_IRWXU);
+        strcat(string, ent->d_name);
+        Copy(open(string, O_RDONLY), dst_fd);
+        strcpy(string, src);
+    }
+    printf("\n\n");
+    return 0;
 }
 
 

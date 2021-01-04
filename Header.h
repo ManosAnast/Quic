@@ -18,10 +18,24 @@
  * dst: destination path.
  *
  * Return:
- *      In case of success it returns the dst_fd.
+ *      In case of success it returns the 0.
  *      In case of something going wrong it returns -1
 */
 int DeepCopy(int src_fd, char * src, char * dst);
+
+
+/* It copies all the files that the directory "dir" has.
+ * 
+ * src_fd: source file descriptor.
+ * src: source path.
+ * dst: destination path.
+ * dir: A DIR stream that points to the directory that you want to copy it's files.
+ *
+ * Return:
+ *      In case of success it returns the 0.
+ *      In case of something going wrong it returns -1
+*/
+int CopyFiles(int src_fd, char * src, char * dst, DIR * dir);
 
 
 /* It copies all the content of the source to the destination path.

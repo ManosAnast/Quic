@@ -3,12 +3,9 @@
 int DeepCopy(int src_fd, char * src, char * dst)
 {
     
-    // Check if the destination as given exists. If it doesn't create it 
+    // Create the destination path since we enter this function if the destination path doesn't exit
     // and add the last part of the source path, which is the file.
-    DIR * dir= opendir(dst);
-    if (errno == ENOENT){
-        mkdir(dst, 0700);
-    }
+    mkdir(dst, 0700);
     dst=PathMaker(src,dst);
 
     //Create the file at the destination path
@@ -18,7 +15,6 @@ int DeepCopy(int src_fd, char * src, char * dst)
     }
 
     // Copy the content of the source path to the destination path
-    // and then close them
     if (Copy(src_fd, dst_fd) == -1){
         return -1;
     }

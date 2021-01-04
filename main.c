@@ -10,20 +10,15 @@ int main(int argc, char * argv[])
     //I need to do read and write implementation
     int src_fd=open(src, O_RDONLY), dst_fd=open(dst, O_WRONLY);
 
-    // DIR * dir= opendir(dst);
-    // if (errno == ENOENT){
-        
-    // }
-    
-
-    if(dst_fd == -1){
+    // Check if the destination as given exists.
+    DIR * dir= opendir(dst);
+    if (errno == ENOENT){    
         dst_fd=DeepCopy(src_fd, src, dst);
     }
     else{
         //Here we are coping the files that are not copied
         Copy(src_fd, dst_fd);
     }
-    
 
     if(dst_fd == -1){
         printf("DeepCopy error\n"); return 1;

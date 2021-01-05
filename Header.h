@@ -38,6 +38,19 @@ int DeepCopy(int src_fd, char * src, char * dst);
 int CopyFiles(int src_fd, char * src, char * dst, DIR * dir);
 
 
+/* It checks if a path is a file.
+ * 
+ * src: source path.
+ *
+ * Return:
+ *      If the path is a symbolic link it returns 2.
+ *      If the path is a file it returns 1.
+ *      If the path is a directory it returns 0.
+ *      In case of something going wrong it returns -1.
+*/
+int FileType(char * src);
+
+
 /* It copies all the content of the source to the destination path.
  *
  * src_fd: source file descriptor.

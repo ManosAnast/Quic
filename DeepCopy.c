@@ -10,9 +10,6 @@ int DeepCopy(int src_fd, char * src, char * dst)
 
     //Create the file at the destination path
     int dst_fd=creat(dst, S_IRWXU);
-    // if (dst_fd == -1){
-    //     perror("DeepCopy"); return dst_fd;
-    // }
 
     // Copy the content of the source path to the destination path
     if (CopyFiles(src_fd, src, dst, opendir(src)) == -1){
@@ -30,18 +27,50 @@ int CopyFiles(int src_fd, char * src, char * dst, DIR * dir)
     }
 
     struct dirent * ent;
-    char * string = (char *)calloc(strlen(src), sizeof(char));
+    char * src_dummy = (char *)calloc(strlen(src), sizeof(char));
+    char * dst_dummy = (char *)calloc(strlen(src), sizeof(char));
     int counter=0;
     // Here the string doesn't work as it should.
+    strcpy(dst_dummy, dst); strcpy(src_dummy, src);
     while ( (ent = readdir(dir)) != NULL){
-        printf("%s\n",ent->d_name);
-        int dst_fd=creat(strcat(dst, ent->d_name), S_IRWXU);
-        strcat(string, ent->d_name);
-        Copy(open(string, O_RDONLY), dst_fd);
-        strcpy(string, src);
+        if(strcmp(ent->d_name, "..") != 0 && strcmp(ent->d_name, ".") != 0 /*&& strcmp(ent->d_name, ".git") != 0*/ ){
+            printf("%s\n",ent->d_name);
+            int dst_fd=creat(strcat(dst_dummy, ent->d_name), S_IRWXU);
+            strcat(src_dummy, ent->d_name);
+            if(FileType(src_dummy) == 0){
+                strcat(src_dummy, "/");
+                int err=DeepCopy(open(src_dummy, O_RDONLY), src_dummy, dst_dummy);
+                if(err == -1){
+                    printf("Fuck\n"); return 1;
+                }
+            }
+            Copy(open(src_dummy, O_RDONLY), dst_fd);
+            strcpy(dst_dummy, dst); strcpy(src_dummy, src);
+        }
     }
     printf("\n\n");
     return 0;
+}
+
+
+int FileType(char * src)
+{
+    struct stat path_stat;
+    if( stat(src, &path_stat) == -1){
+        perror("Stat");
+        return -1;
+    }
+
+    if( (path_stat.st_mode & S_IFMT) == S_IFREG){
+        return 1;
+    }
+    else if( (path_stat.st_mode & S_IFMT) == S_IFLNK){
+        return 1;
+    }
+    else if( (path_stat.st_mode & S_IFMT) == S_IFDIR){
+        return 0;
+    }
+    return -1;
 }
 
 

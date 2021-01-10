@@ -15,12 +15,8 @@ int main(int argc, char * argv[])
     // Check if the destination as given exists.
     DIR * dir= opendir(dst);
     if (errno == ENOENT){    
-        check=DeepCopy(src_fd, src, dst);
+        check=DeepCopy(src, dst);
     }
-    // else{
-    //     //Here we are coping the files that are not copied
-    //     Copy(src_fd, dst_fd);
-    // }
 
     if(check == -1){
         printf("DeepCopy error\n"); return 1;

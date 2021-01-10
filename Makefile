@@ -4,6 +4,7 @@ all: clean main.o DeepCopy.o
 main.o: main.c
 	gcc -g -c main.c
 
+
 DeepCopy.o: main.c
 	gcc -g -c DeepCopy.c
 

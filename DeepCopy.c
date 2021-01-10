@@ -1,6 +1,6 @@
 # include "Header.h"
 
-int DeepCopy(int src_fd, char * src, char * dst)
+int DeepCopy(char * src, char * dst)
 {
     
     // Create the destination path since we enter this function if the destination path doesn't exit

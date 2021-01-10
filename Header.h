@@ -13,7 +13,6 @@
 /* It makes a deepcopy of the source to the destination, which means that copies the cp -r command.
  * At the end it closes the files.
  * 
- * src_fd: source file descriptor.
  * src: source path.
  * dst: destination path.
  *
@@ -21,7 +20,7 @@
  *      In case of success it returns the 0.
  *      In case of something going wrong it returns -1
 */
-int DeepCopy(int src_fd, char * src, char * dst);
+int DeepCopy(char * src, char * dst);
 
 
 /* It copies all the files that the directory "dir" has.

@@ -6,50 +6,113 @@ int DeepCopy(int src_fd, char * src, char * dst)
     // Create the destination path since we enter this function if the destination path doesn't exit
     // and add the last part of the source path, which is the file.
     mkdir(dst, 0700);
-    dst=PathMaker(src,dst);
+    // dst=PathMaker(src,dst);
 
     //Create the file at the destination path
-    int dst_fd=creat(dst, S_IRWXU);
+    // int dst_fd=creat(dst, S_IRWXU);
 
     // Copy the content of the source path to the destination path
-    if (CopyFiles(src_fd, src, dst, opendir(src)) == -1){
+    if (CopyFiles(src, dst) == -1){
         return -1;
     }
-    close(src_fd); close(dst_fd);
+    close(src_fd); 
 
     return 0;
 }
 
-int CopyFiles(int src_fd, char * src, char * dst, DIR * dir)
+int CopyFiles(char * src, char * dst)
 {
+    DIR * dir = opendir(src);
     if(dir == NULL){
         perror("CopyFile"); return -1;
     }
 
     struct dirent * ent;
-    char * src_dummy = (char *)calloc(strlen(src), sizeof(char));
-    char * dst_dummy = (char *)calloc(strlen(src), sizeof(char));
     int counter=0;
-    // Here the string doesn't work as it should.
-    strcpy(dst_dummy, dst); strcpy(src_dummy, src);
     while ( (ent = readdir(dir)) != NULL){
-        if(strcmp(ent->d_name, "..") != 0 && strcmp(ent->d_name, ".") != 0 /*&& strcmp(ent->d_name, ".git") != 0*/ ){
+        if(strcmp(ent->d_name, "..") != 0 && strcmp(ent->d_name, ".") != 0 ){
             printf("%s\n",ent->d_name);
-            int dst_fd=creat(strcat(dst_dummy, ent->d_name), S_IRWXU);
-            strcat(src_dummy, ent->d_name);
-            if(FileType(src_dummy) == 0){
-                strcat(src_dummy, "/");
-                int err=DeepCopy(open(src_dummy, O_RDONLY), src_dummy, dst_dummy);
-                if(err == -1){
-                    printf("Fuck\n"); return 1;
-                }
+            strcat(src, ent->d_name);
+            if(FileType(src) == 1){
+                int src_fd=open(src, O_RDONLY);
+                strcat(dst, ent->d_name);
+                int dst_fd=creat(dst, S_IRWXU);
+                Copy(src_fd, dst_fd);
             }
-            Copy(open(src_dummy, O_RDONLY), dst_fd);
-            strcpy(dst_dummy, dst); strcpy(src_dummy, src);
+            else{
+                // strcat(src, "/");
+                CopyFolder(src, FrontTrack(dst, ent->d_name));
+            }
+            src=BackTrack(src);
+            dst=BackTrack(dst);   
         }
     }
     printf("\n\n");
     return 0;
+}
+// int CopyFiles(char * src, char * dst, DIR * dir)
+// {
+//     if(dir == NULL){
+//         perror("CopyFile"); return -1;
+//     }
+
+//     struct dirent * ent;
+//     while ( (ent = readdir(dir)) != NULL){
+//         if(strcmp(ent->d_name, "..") != 0 && strcmp(ent->d_name, ".") != 0 ){
+//             if(FileType(FrontTrack(src, ent->d_name))==1){
+//                 int dst_fd=creat(FrontTrack(dst, ent->d_name), S_IRWXU);
+//                 Copy(open(FrontTrack(src, ent->d_name), O_RDONLY), dst_fd);
+//             }
+//             else{
+//                 strcat(src, "/");
+//                 CopyFolder(src, dst);
+//             }
+//         }
+//     }
+//     return 0;
+// }
+
+
+int CopyFolder(char * src, char * dst)
+{
+    // dst=PathMaker(src, dst);
+    mkdir(dst, 0700);
+
+    if(CopyFiles(src, dst) == -1){
+        return -1;
+    }
+
+    return 0;
+}
+
+
+char * BackTrack(char * src)
+{
+    int i, length=strlen(src);
+    for (i = length; i > 0 ; i--){
+        if (src[i] == '/' && i !=length ){
+            src[i+1]='\0';
+            break;
+        }
+    }
+    return src;
+}
+
+
+char * FrontTrack(char * src, char * Next)
+{
+    int length=strlen(src);
+    char * file =(char *)malloc(sizeof(char)*strlen(src));
+    strcpy(file, src);
+    if( file[length-1] != '/'){
+        strcat(file, "/");
+        strcat(file, Next);
+    }
+    else{
+        strcat(file, Next);
+    }
+    strcat(file, "/");
+    return file;
 }
 
 

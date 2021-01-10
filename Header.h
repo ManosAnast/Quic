@@ -26,16 +26,26 @@ int DeepCopy(int src_fd, char * src, char * dst);
 
 /* It copies all the files that the directory "dir" has.
  * 
- * src_fd: source file descriptor.
  * src: source path.
  * dst: destination path.
- * dir: A DIR stream that points to the directory that you want to copy it's files.
  *
  * Return:
  *      In case of success it returns the 0.
  *      In case of something going wrong it returns -1
 */
-int CopyFiles(int src_fd, char * src, char * dst, DIR * dir);
+int CopyFiles(char * src, char * dst);
+
+
+/* It creates a new folder and copies it's content.
+ * 
+ * src: source path.
+ * dst: destination path.
+ *
+ * Return:
+ *      In case of success it returns the 0.
+ *      In case of something going wrong it returns -1
+*/
+int CopyFolder(char * src, char * dst);
 
 
 /* It checks if a path is a file.
@@ -49,6 +59,12 @@ int CopyFiles(int src_fd, char * src, char * dst, DIR * dir);
  *      In case of something going wrong it returns -1.
 */
 int FileType(char * src);
+
+
+char * BackTrack(char * src);
+
+char * FrontTrack(char * src, char * Next);
+
 
 
 /* It copies all the content of the source to the destination path.

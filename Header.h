@@ -28,12 +28,13 @@ int DeepCopy(int src_fd, char * src, char * dst);
  * 
  * src: source path.
  * dst: destination path.
+ * dir: Directory pointer.
  *
  * Return:
  *      In case of success it returns the 0.
  *      In case of something going wrong it returns -1
 */
-int CopyFiles(char * src, char * dst);
+int CopyFiles(char * src, char * dst, DIR * dir);
 
 
 /* It creates a new folder and copies it's content.
@@ -45,7 +46,7 @@ int CopyFiles(char * src, char * dst);
  *      In case of success it returns the 0.
  *      In case of something going wrong it returns -1
 */
-int CopyFolder(char * src, char * dst);
+int CopyFolder(char * src, char * dst, char * Next);
 
 
 /* It checks if a path is a file.
@@ -61,10 +62,25 @@ int CopyFolder(char * src, char * dst);
 int FileType(char * src);
 
 
-char * BackTrack(char * src);
+/* It mimics the "cp .." command. Takes a path and takes one step back.
+ *
+ * pth: File path that we want to change.
+ *
+ * Return:
+ *      In case of success it returns the new path.
+*/
+char * BackTrack(char * pth);
 
-char * FrontTrack(char * src, char * Next);
 
+/* It adds to the file path, the file/directory that we want to go.
+ *
+ * pth: File path that we want to change.
+ * Next: File or directory that we want to go to.
+ *
+ * Return:
+ *      In case of success it returns the new path.
+*/
+char * FrontTrack(char * pth, char * Next);
 
 
 /* It copies all the content of the source to the destination path.

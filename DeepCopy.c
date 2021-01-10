@@ -6,23 +6,18 @@ int DeepCopy(int src_fd, char * src, char * dst)
     // Create the destination path since we enter this function if the destination path doesn't exit
     // and add the last part of the source path, which is the file.
     mkdir(dst, 0700);
-    // dst=PathMaker(src,dst);
-
-    //Create the file at the destination path
-    // int dst_fd=creat(dst, S_IRWXU);
 
     // Copy the content of the source path to the destination path
-    if (CopyFiles(src, dst) == -1){
+    if (CopyFiles(src, dst, opendir(src)) == -1){
         return -1;
     }
-    close(src_fd); 
 
+    printf("\n\n");
     return 0;
 }
 
-int CopyFiles(char * src, char * dst)
+int CopyFiles(char * src, char * dst, DIR * dir)
 {
-    DIR * dir = opendir(src);
     if(dir == NULL){
         perror("CopyFile"); return -1;
     }
@@ -31,54 +26,37 @@ int CopyFiles(char * src, char * dst)
     int counter=0;
     while ( (ent = readdir(dir)) != NULL){
         if(strcmp(ent->d_name, "..") != 0 && strcmp(ent->d_name, ".") != 0 ){
-            printf("%s\n",ent->d_name);
-            strcat(src, ent->d_name);
+            
+            src=FrontTrack(src, ent->d_name);
+            
+            printf("%s\n",src);
+
             if(FileType(src) == 1){
                 int src_fd=open(src, O_RDONLY);
-                strcat(dst, ent->d_name);
+                dst=FrontTrack(dst, ent->d_name);
                 int dst_fd=creat(dst, S_IRWXU);
                 Copy(src_fd, dst_fd);
             }
             else{
-                // strcat(src, "/");
-                CopyFolder(src, FrontTrack(dst, ent->d_name));
+                dst=FrontTrack(dst, ent->d_name);
+                if( CopyFolder(src, dst, ent->d_name) == -1 ){
+                    return -1;
+                }
             }
             src=BackTrack(src);
             dst=BackTrack(dst);   
         }
     }
-    printf("\n\n");
     return 0;
 }
-// int CopyFiles(char * src, char * dst, DIR * dir)
-// {
-//     if(dir == NULL){
-//         perror("CopyFile"); return -1;
-//     }
-
-//     struct dirent * ent;
-//     while ( (ent = readdir(dir)) != NULL){
-//         if(strcmp(ent->d_name, "..") != 0 && strcmp(ent->d_name, ".") != 0 ){
-//             if(FileType(FrontTrack(src, ent->d_name))==1){
-//                 int dst_fd=creat(FrontTrack(dst, ent->d_name), S_IRWXU);
-//                 Copy(open(FrontTrack(src, ent->d_name), O_RDONLY), dst_fd);
-//             }
-//             else{
-//                 strcat(src, "/");
-//                 CopyFolder(src, dst);
-//             }
-//         }
-//     }
-//     return 0;
-// }
 
 
-int CopyFolder(char * src, char * dst)
+int CopyFolder(char * src, char * dst, char * Next)
 {
-    // dst=PathMaker(src, dst);
     mkdir(dst, 0700);
 
-    if(CopyFiles(src, dst) == -1){
+    // Copy the content of the source path to the destination path
+    if (CopyFiles(src, dst, opendir(src)) == -1){
         return -1;
     }
 
@@ -102,7 +80,7 @@ char * BackTrack(char * src)
 char * FrontTrack(char * src, char * Next)
 {
     int length=strlen(src);
-    char * file =(char *)malloc(sizeof(char)*strlen(src));
+    char * file =(char *)calloc(length+strlen(Next)+2, sizeof(char));
     strcpy(file, src);
     if( file[length-1] != '/'){
         strcat(file, "/");
@@ -111,7 +89,6 @@ char * FrontTrack(char * src, char * Next)
     else{
         strcat(file, Next);
     }
-    strcat(file, "/");
     return file;
 }
 

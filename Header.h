@@ -104,3 +104,40 @@ int Copy(int src_fd, int dst_fd);
  *      In case of something going wrong it returns nullstring.
 */
 char * PathMaker(char * src, char * dst);
+
+
+/* It checks if the 2 files are equal.
+ * It takes under consideration all the cases.
+ * 
+ * src_fd: file descriptor of the source file.
+ * dst_fd: file descriptor of the destination file.
+ *
+ * Return:
+ *      If the files are equal returns the 1.
+ *      If the files aren't equal returns the 0.
+*/
+int isEqual(int src_fd, int dst_fd);
+
+
+/* It checks if the 2 files have the same size.
+ * 
+ * src_fd: file descriptor of the source file.
+ * dst_fd: file descriptor of the destination file.
+ *
+ * Return:
+ *      If the files have the same size, it returns the 1.
+ *      If the files don't have the same size, it returns the 0.
+*/
+int EqualSize(int src_fd, int dst_fd);
+
+
+/* It checks if the 2 files are modified at the same time.
+ * 
+ * src_fd: file descriptor of the source file.
+ * dst_fd: file descriptor of the destination file.
+ *
+ * Return:
+ *      If the files are modified at the same time, it returns the 1.
+ *      If the files aren't modified at the same time, it returns the 0.
+*/
+int SameDate(int src_fd, int dst_fd);

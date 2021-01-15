@@ -17,10 +17,17 @@ int main(int argc, char * argv[])
     if (errno == ENOENT){    
         check=DeepCopy(src, dst);
     }
+    else if (errno == 0)
+    {
+        check=DeepCopy(src, dst);
+    }
+    
 
     if(check == -1){
         printf("DeepCopy error\n"); return 1;
     }
-
+    
+    free(src); free(dst);
+    free(dir);
     return 0;
 }

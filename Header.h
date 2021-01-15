@@ -33,6 +33,9 @@ int DeepCopy(char * src, char * dst);
  *      In case of success it returns the 0.
  *      In case of something going wrong it returns -1
 */
+int DeepCopyFiles(char * src, char * dst, DIR * dir);
+
+
 int CopyFiles(char * src, char * dst, DIR * dir);
 
 
@@ -116,7 +119,7 @@ char * PathMaker(char * src, char * dst);
  *      If the files are equal returns the 1.
  *      If the files aren't equal returns the 0.
 */
-int isEqual(int src_fd, int dst_fd);
+int isEqual(char * src_fd, char * dst_fd);
 
 
 /* It checks if the 2 files have the same size.

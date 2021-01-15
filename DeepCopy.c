@@ -3,20 +3,28 @@
 int DeepCopy(char * src, char * dst)
 {
     
-    // Create the destination path since we enter this function if the destination path doesn't exit
-    // and add the last part of the source path, which is the file.
-    mkdir(dst, 0700);
+    if(errno == ENOENT){
+        // Create the destination path since we enter this function if the destination path doesn't exit
+        // and add the last part of the source path, which is the file.
+        mkdir(dst, 0700);
 
-    // Copy the content of the source path to the destination path
-    if (CopyFiles(src, dst, opendir(src)) == -1){
-        return -1;
+        // Copy the content of the source path to the destination path
+        if (DeepCopyFiles(src, dst, opendir(src)) == -1){
+            return -1;
+        }
     }
-
+    else if (errno == 0)
+    {
+        if (CopyFiles(src, dst, opendir(src)) == -1){
+            return -1;
+        }
+    }
+    
     printf("\n\n");
     return 0;
 }
 
-int CopyFiles(char * src, char * dst, DIR * dir)
+int DeepCopyFiles(char * src, char * dst, DIR * dir)
 {
     if(dir == NULL){
         perror("CopyFile"); return -1;
@@ -47,6 +55,7 @@ int CopyFiles(char * src, char * dst, DIR * dir)
             dst=BackTrack(dst);   
         }
     }
+    free(dir);
     return 0;
 }
 
@@ -56,7 +65,7 @@ int CopyFolder(char * src, char * dst, char * Next)
     mkdir(dst, 0700);
 
     // Copy the content of the source path to the destination path
-    if (CopyFiles(src, dst, opendir(src)) == -1){
+    if (DeepCopyFiles(src, dst, opendir(src)) == -1){
         return -1;
     }
 
@@ -89,7 +98,9 @@ char * FrontTrack(char * src, char * Next)
     else{
         strcat(file, Next);
     }
-    return file;
+    strcpy(src, file);
+    free(file);
+    return src;
 }
 
 

@@ -143,4 +143,4 @@ int SameDate(int src_fd, int dst_fd);
  *      In case of success it returns the 0.
  *      In case of something going wrong it returns -1
 */
-int Delete(char * src, char * dst);
+int Delete(char * src, char * dst, bool Vflag);

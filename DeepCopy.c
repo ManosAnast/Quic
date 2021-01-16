@@ -18,12 +18,11 @@ int DeepCopy(char * src, char * dst, bool Vflag, bool Dflag, bool Lflag)
         if (CopyFiles(src, dst, opendir(src), Vflag, Dflag, Lflag) == -1){
             return -1;
         }
-        if (Dflag && Delete(src, dst) == -1){
+        if (Dflag && Delete(src, dst, Vflag) == -1){
             return -1;
         }
     }
     
-    printf("\n\n");
     return 0;
 }
 

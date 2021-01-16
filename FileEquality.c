@@ -95,7 +95,7 @@ int SameDate(int src_fd, int dst_fd)
 }
 
 
-int Delete(char * src, char * dst)
+int Delete(char * src, char * dst, bool Vflag)
 {
     DIR * dir=opendir(dst);
     if(dir == NULL){
@@ -117,17 +117,25 @@ int Delete(char * src, char * dst)
                     if(remove(dst) == -1){
                         perror("Remove"); return -1;
                     }
+                    if(Vflag){
+                        printf("Delete: %s\n",dst);
+                    }
                 }
             }
-            // else{
-            //     src=FrontTrack(src, ent->d_name);
-            //     int src_fd=open(src,O_RDONLY);
-            //     if(src_fd == -1){
-            //         if(remove(dst) == -1){
-            //             perror("Remove"); return -1;
-            //         }
-            //     }
-            // }
+            else{
+                int src_fd=open(src,O_RDONLY);
+                if(src_fd == -1){
+                    if(Delete(src, dst, Vflag) == -1){
+                        return -1;
+                    }
+                    if(remove(dst) == -1){
+                        perror("Remove"); return -1;
+                    }
+                    if(Vflag){
+                        printf("Delete: %s\n",dst);
+                    }
+                }
+            }
             
             src=BackTrack(src);
             dst=BackTrack(dst);   

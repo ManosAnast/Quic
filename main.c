@@ -46,5 +46,6 @@ int main(int argc, char * argv[])
     
     free(src); free(dst);
     free(dir);
+    printf("\n");
     return 0;
 }

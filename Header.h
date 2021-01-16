@@ -7,7 +7,9 @@
 # include <string.h>
 # include <dirent.h>
 # include <errno.h>
+# include <stdbool.h>
 # define nullstring " "
+
 
 
 /* It makes a deepcopy of the source to the destination, which means that copies the cp -r command.
@@ -20,7 +22,20 @@
  *      In case of success it returns the 0.
  *      In case of something going wrong it returns -1
 */
-int DeepCopy(char * src, char * dst);
+int DeepCopy(char * src, char * dst, bool Vflag, bool Dflag, bool Lflag);
+
+
+/* It copies all the files that has been updated from the directory "dir".
+ * 
+ * src: source path.
+ * dst: destination path.
+ * dir: Directory pointer.
+ *
+ * Return:
+ *      In case of success it returns the 0.
+ *      In case of something going wrong it returns -1
+*/
+int DeepCopyFiles(char * src, char * dst, DIR * dir, bool Vflag, bool Dflag, bool Lflag);
 
 
 /* It copies all the files that the directory "dir" has.
@@ -33,22 +48,7 @@ int DeepCopy(char * src, char * dst);
  *      In case of success it returns the 0.
  *      In case of something going wrong it returns -1
 */
-int DeepCopyFiles(char * src, char * dst, DIR * dir);
-
-
-int CopyFiles(char * src, char * dst, DIR * dir);
-
-
-/* It creates a new folder and copies it's content.
- * 
- * src: source path.
- * dst: destination path.
- *
- * Return:
- *      In case of success it returns the 0.
- *      In case of something going wrong it returns -1
-*/
-int CopyFolder(char * src, char * dst, char * Next);
+int CopyFiles(char * src, char * dst, DIR * dir, bool Vflag, bool Dflag, bool Lflag);
 
 
 /* It checks if a path is a file.
@@ -97,18 +97,6 @@ char * FrontTrack(char * pth, char * Next);
 int Copy(int src_fd, int dst_fd);
 
 
-/* It adds to the destination path the file that needs to be created, in order to copy to it the source file.
- *
- * src: source file path.
- * dst: destination file path.
- *
- * Return:
- *      In case of success it returns the new destination path.
- *      In case of something going wrong it returns nullstring.
-*/
-char * PathMaker(char * src, char * dst);
-
-
 /* It checks if the 2 files are equal.
  * It takes under consideration all the cases.
  * 
@@ -144,3 +132,15 @@ int EqualSize(int src_fd, int dst_fd);
  *      If the files aren't modified at the same time, it returns the 0.
 */
 int SameDate(int src_fd, int dst_fd);
+
+
+/* Delete a file/directory, if it needs to be deleted.
+ * 
+ * src: source path.
+ * dst: destination path.
+ *
+ * Return:
+ *      In case of success it returns the 0.
+ *      In case of something going wrong it returns -1
+*/
+int Delete(char * src, char * dst);

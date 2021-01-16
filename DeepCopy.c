@@ -1,6 +1,6 @@
 # include "Header.h"
 
-int DeepCopy(char * src, char * dst)
+int DeepCopy(char * src, char * dst, bool Vflag, bool Dflag, bool Lflag)
 {
     
     if(errno == ENOENT){
@@ -9,13 +9,16 @@ int DeepCopy(char * src, char * dst)
         mkdir(dst, 0700);
 
         // Copy the content of the source path to the destination path
-        if (DeepCopyFiles(src, dst, opendir(src)) == -1){
+        if (DeepCopyFiles(src, dst, opendir(src), Vflag, Dflag, Lflag) == -1){
             return -1;
         }
     }
     else if (errno == 0)
     {
-        if (CopyFiles(src, dst, opendir(src)) == -1){
+        if (CopyFiles(src, dst, opendir(src), Vflag, Dflag, Lflag) == -1){
+            return -1;
+        }
+        if (Dflag && Delete(src, dst) == -1){
             return -1;
         }
     }
@@ -24,7 +27,7 @@ int DeepCopy(char * src, char * dst)
     return 0;
 }
 
-int DeepCopyFiles(char * src, char * dst, DIR * dir)
+int DeepCopyFiles(char * src, char * dst, DIR * dir, bool Vflag, bool Dflag, bool Lflag)
 {
     if(dir == NULL){
         perror("CopyFile"); return -1;
@@ -37,7 +40,9 @@ int DeepCopyFiles(char * src, char * dst, DIR * dir)
             
             src=FrontTrack(src, ent->d_name);
             
-            printf("%s\n",src);
+            if(Vflag){
+                printf("%s\n",src);
+            }
 
             if(FileType(src) == 1){
                 int src_fd=open(src, O_RDONLY);
@@ -47,7 +52,8 @@ int DeepCopyFiles(char * src, char * dst, DIR * dir)
             }
             else{
                 dst=FrontTrack(dst, ent->d_name);
-                if( CopyFolder(src, dst, ent->d_name) == -1 ){
+                mkdir(dst, 0700);
+                if( DeepCopyFiles(src, dst, opendir(src), Vflag, Dflag, Lflag) == -1 ){
                     return -1;
                 }
             }
@@ -56,19 +62,6 @@ int DeepCopyFiles(char * src, char * dst, DIR * dir)
         }
     }
     free(dir);
-    return 0;
-}
-
-
-int CopyFolder(char * src, char * dst, char * Next)
-{
-    mkdir(dst, 0700);
-
-    // Copy the content of the source path to the destination path
-    if (DeepCopyFiles(src, dst, opendir(src)) == -1){
-        return -1;
-    }
-
     return 0;
 }
 
@@ -147,27 +140,4 @@ int Copy(int src_fd, int dst_fd)
         }
     }
     return 0;
-}
-
-
-char * PathMaker(char * src, char * dst)
-{
-    int i;
-    for (i = strlen(src); i > 0 ; i--){
-        if (src[i] == '/'){
-            break;
-        }
-        
-    }
-    int filelength= strlen(src)-i;
-    char * file=(char *)calloc(filelength, sizeof(char));
-
-    int j=0;
-    for ( i++; i < strlen(src); i++){
-        file[j++]=src[i];
-    }
-    strcat(dst, file);
-    
-    free(file);
-    return dst;
 }

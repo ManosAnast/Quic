@@ -1,7 +1,7 @@
 # include "Header.h"
 
 
-int CopyFiles(char * src, char * dst, DIR * dir)
+int CopyFiles(char * src, char * dst, DIR * dir, bool Vflag, bool Dflag, bool Lflag)
 {
     if(dir == NULL){
         perror("CopyFile"); return -1;
@@ -13,17 +13,28 @@ int CopyFiles(char * src, char * dst, DIR * dir)
         if(strcmp(ent->d_name, "..") != 0 && strcmp(ent->d_name, ".") != 0 ){
             
             src=FrontTrack(src, ent->d_name);
+            dst=FrontTrack(dst, ent->d_name);
             
-
             if(FileType(src) == 1){
-                dst=FrontTrack(dst, ent->d_name);
                 int src_fd=open(src, O_RDONLY);
                 int dst_fd=open(dst, O_WRONLY);
-                if(EqualSize(src_fd, dst_fd) || !SameDate(src_fd, dst_fd)){
-                    printf("%s\n",src);
+                if(dst_fd == -1){
+                    dst_fd=creat(dst, S_IRWXU);
+                }
+                if( !EqualSize(src_fd, dst_fd) || !SameDate(src_fd, dst_fd)){
+                    if(Vflag){
+                        printf("%s\n",src);
+                    }
                     Copy(src_fd, dst_fd);
                 }
             }
+            else{
+                opendir(dst);
+                if( DeepCopy(src, dst, Vflag, Dflag, Lflag) == -1 ){
+                    return -1;
+                }
+            }
+            
             src=BackTrack(src);
             dst=BackTrack(dst);   
         }
@@ -77,7 +88,51 @@ int SameDate(int src_fd, int dst_fd)
     if (src_buff.st_mtime == dst_buff.st_mtime){
         return 1;
     }
-    else{
+    else if(src_buff.st_mtime > dst_buff.st_mtime){
         return 0;
     }
+    return 1;
+}
+
+
+int Delete(char * src, char * dst)
+{
+    DIR * dir=opendir(dst);
+    if(dir == NULL){
+        perror("CopyFile"); return -1;
+    }
+
+    struct dirent * ent;
+    int counter=0;
+    while ( (ent = readdir(dir)) != NULL){
+        if(strcmp(ent->d_name, "..") != 0 && strcmp(ent->d_name, ".") != 0 ){
+            
+            dst=FrontTrack(dst, ent->d_name);
+            src=FrontTrack(src, ent->d_name);
+            
+            if(FileType(dst) == 1){
+                int src_fd=open(src, O_RDONLY);
+                int dst_fd=open(dst, O_WRONLY);
+                if(src_fd == -1){
+                    if(remove(dst) == -1){
+                        perror("Remove"); return -1;
+                    }
+                }
+            }
+            // else{
+            //     src=FrontTrack(src, ent->d_name);
+            //     int src_fd=open(src,O_RDONLY);
+            //     if(src_fd == -1){
+            //         if(remove(dst) == -1){
+            //             perror("Remove"); return -1;
+            //         }
+            //     }
+            // }
+            
+            src=BackTrack(src);
+            dst=BackTrack(dst);   
+        }
+    }
+    free(dir);
+    return 0;
 }

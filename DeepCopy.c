@@ -77,7 +77,7 @@ char * BackTrack(char * src)
 {
     int i, length=strlen(src);
     for (i = length; i > 0 ; i--){
-        if (src[i] == '/' && i !=length ){
+        if (src[i] == '/' && i !=length-1 ){
             src[i+1]='\0';
             break;
         }

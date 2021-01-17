@@ -16,7 +16,13 @@ int CopyFiles(char * src, char * dst, DIR * dir, bool Vflag, bool Dflag, bool Lf
             dst=FrontTrack(dst, ent->d_name);
             
             int Type=FileType(src, Lflag);
-            if(Type == 1){ //File
+            if(Type == 0){ //Directory
+                opendir(dst);
+                if( DeepCopy(src, dst, Vflag, Dflag, Lflag) == -1 ){
+                    return -1;
+                }
+            }
+            else if(Type == 1){ //File
                 int src_fd=open(src, O_RDONLY);
                 int dst_fd=open(dst, O_WRONLY);
                 if(dst_fd == -1){
@@ -30,24 +36,38 @@ int CopyFiles(char * src, char * dst, DIR * dir, bool Vflag, bool Dflag, bool Lf
                 }
                 close(src_fd); close(dst_fd);
             }
-            else if(Type == 0){ //Directory
-                opendir(dst);
-                if( DeepCopy(src, dst, Vflag, Dflag, Lflag) == -1 ){
-                    return -1;
-                }
-            }
             else if (Type == 2){ //Symbolic link
-                char buf[100];
-                readlink(src, buf, sizeof(buf));
-                if(symlink(buf, dst) == -1){
-                    perror("Symlink");
+                int src_fd=open(src, O_RDONLY);
+                int dst_fd=open(dst, O_WRONLY);
+                if( !EqualSize(src_fd, dst_fd) || !SameDate(src_fd, dst_fd) || dst_fd == -1){
+                    if(Vflag){
+                        printf("%s\n",src);
+                    }
+                    char buf[100];
+                    readlink(src, buf, sizeof(buf));
+                    if(symlink(buf, dst) == -1){
+                        perror("Symlink");
+                    }
                 }
             }
-            
+            else if (Type == 3){ //Hard link
+                int src_fd=open(src, O_RDONLY);
+                int dst_fd=open(dst, O_WRONLY);
+                if( !EqualSize(src_fd, dst_fd) || !SameDate(src_fd, dst_fd) || dst_fd == -1){
+                    if(Vflag){
+                        printf("%s\n",src);
+                    }
+                    if(link(src, dst) == 0){
+                        perror("Link"); 
+                    }
+                }
+            }
+
             src=BackTrack(src);
             dst=BackTrack(dst);   
         }
     }
+    // free(src); free(dst);
     free(dir);
     return 0;
 }

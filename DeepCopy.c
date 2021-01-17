@@ -47,29 +47,37 @@ int DeepCopyFiles(char * src, char * dst, DIR * dir, bool Vflag, bool Dflag, boo
             }
 
             int Type=FileType(src, Lflag);
-            if(Type == 1){
-                int src_fd=open(src, O_RDONLY);
-                int dst_fd=creat(dst, S_IRWXU);
-                Copy(src_fd, dst_fd);
-                close(src_fd); close(dst_fd);
-            }
-            else if (Type == 0){
+            if (Type == 0){ //Directory
                 mkdir(dst, 0700);
                 if( DeepCopyFiles(src, dst, opendir(src), Vflag, Dflag, Lflag) == -1 ){
                     return -1;
                 }
             }
-            else if (Type == 2){ //Symbolic link;
-                char buf[100];
-                readlink(src, buf, sizeof(buf));
+            else if(Type == 1){ //File
+                int src_fd=open(src, O_RDONLY);
+                int dst_fd=creat(dst, S_IRWXU);
+                Copy(src_fd, dst_fd);
+                close(src_fd); close(dst_fd);
+            }
+            else if (Type == 2){ //Symbolic link
+                char buf[strlen(src)];
+                int result=readlink(src, buf, sizeof(buf));
+                buf[result-1]='\0';
                 if(symlink(buf, dst) == -1){
                     perror("Symlink");
                 }
             }
+            else if (Type == 3){ //Hard link
+                if(link(src, dst) == -1){
+                    perror("Link"); 
+                }
+            }
+            
             src=BackTrack(src);
             dst=BackTrack(dst);   
         }
     }
+    // free(src); free(dst);
     free(dir);
     return 0;
 }
@@ -91,18 +99,20 @@ char * BackTrack(char * src)
 char * FrontTrack(char * src, char * Next)
 {
     int length=strlen(src);
-    char * file =(char *)calloc(length+strlen(Next)+2, sizeof(char));
-    strcpy(file, src);
-    if( file[length-1] != '/'){
-        strcat(file, "/");
-        strcat(file, Next);
+    // src =(char *)realloc(src, length+strlen(Next)+2);
+    // strcpy(file, src);
+    if( src[length-1] != '/'){
+        // src =(char *)realloc(src, length+strlen(Next)+2);
+        strcat(src, "/");
+        strcat(src, Next);
     }
     else{
-        strcat(file, Next);
+        // src =(char *)realloc(src, length+strlen(Next)+1);
+        strcat(src, Next);
     }
     // strcpy(src, file);
     // free(file);
-    return file;
+    return src;
 }
 
 
@@ -121,6 +131,10 @@ int FileType(char * src, bool Lflag)
         return 1;
     }
     else if( (path_stat.st_mode & S_IFMT) == S_IFREG){ //File
+        if (path_stat.st_nlink > 1 && Lflag){
+            return 3;
+        }
+        
         return 1;
     }
     else if( (path_stat.st_mode & S_IFMT) == S_IFDIR){ //Directory

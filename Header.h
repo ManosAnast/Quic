@@ -25,7 +25,7 @@
 int DeepCopy(char * src, char * dst, bool Vflag, bool Dflag, bool Lflag);
 
 
-/* It copies all the files that has been updated from the directory "dir".
+/* It copies all the files from the source path to the destination path.
  * 
  * src: source path.
  * dst: destination path.
@@ -38,7 +38,7 @@ int DeepCopy(char * src, char * dst, bool Vflag, bool Dflag, bool Lflag);
 int DeepCopyFiles(char * src, char * dst, DIR * dir, bool Vflag, bool Dflag, bool Lflag);
 
 
-/* It copies all the files that the directory "dir" has.
+/* It copies all the files from the source path, that have changed, to the destination path.
  * 
  * src: source path.
  * dst: destination path.
@@ -57,6 +57,7 @@ int CopyFiles(char * src, char * dst, DIR * dir, bool Vflag, bool Dflag, bool Lf
  * Lflag: flag for -l.
  *
  * Return:
+ *      If the path is a hard link it returns 3.
  *      If the path is a symbolic link it returns 2.
  *      If the path is a file it returns 1.
  *      If the path is a directory it returns 0.

@@ -9,6 +9,11 @@ int main(int argc, char * argv[])
     char * src=(char*)calloc(2*strlen(argv[argc-2]), sizeof(char));
     strcpy(dst, argv[argc-1]); strcpy(src, argv[argc-2]);
 
+    if(argc == 1){
+        printf("./quic -l -v -d sourcepath destinationpath");
+        return 0;
+    }
+
     if (argc > 3){
         for (int i = 1; i < argc-2; i++){
             if ( !strcmp(argv[i], "-v")){

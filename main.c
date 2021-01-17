@@ -27,7 +27,6 @@ int main(int argc, char * argv[])
     
 
     //I need to do read and write implementation
-    int src_fd=open(src, O_RDONLY);
     int check;
 
     // Check if the destination as given exists.

@@ -18,8 +18,10 @@ int DeepCopy(char * src, char * dst, bool Vflag, bool Dflag, bool Lflag)
         if (CopyFiles(src, dst, opendir(src), Vflag, Dflag, Lflag) == -1){
             return -1;
         }
-        if (Dflag && Delete(src, dst, Vflag) == -1){
-            return -1;
+        if ( Dflag ){
+            if(Delete(src, dst, Vflag) == -1){
+                return -1;
+            }
         }
     }
     
@@ -38,22 +40,30 @@ int DeepCopyFiles(char * src, char * dst, DIR * dir, bool Vflag, bool Dflag, boo
         if(strcmp(ent->d_name, "..") != 0 && strcmp(ent->d_name, ".") != 0 ){
             
             src=FrontTrack(src, ent->d_name);
+            dst=FrontTrack(dst, ent->d_name);
             
             if(Vflag){
                 printf("%s\n",src);
             }
 
-            if(FileType(src) == 1){
+            int Type=FileType(src, Lflag);
+            if(Type == 1){
                 int src_fd=open(src, O_RDONLY);
-                dst=FrontTrack(dst, ent->d_name);
                 int dst_fd=creat(dst, S_IRWXU);
                 Copy(src_fd, dst_fd);
+                close(src_fd); close(dst_fd);
             }
-            else{
-                dst=FrontTrack(dst, ent->d_name);
+            else if (Type == 0){
                 mkdir(dst, 0700);
                 if( DeepCopyFiles(src, dst, opendir(src), Vflag, Dflag, Lflag) == -1 ){
                     return -1;
+                }
+            }
+            else if (Type == 2){ //Symbolic link;
+                char buf[100];
+                readlink(src, buf, sizeof(buf));
+                if(symlink(buf, dst) == -1){
+                    perror("Symlink");
                 }
             }
             src=BackTrack(src);
@@ -90,27 +100,30 @@ char * FrontTrack(char * src, char * Next)
     else{
         strcat(file, Next);
     }
-    strcpy(src, file);
-    free(file);
-    return src;
+    // strcpy(src, file);
+    // free(file);
+    return file;
 }
 
 
-int FileType(char * src)
+int FileType(char * src, bool Lflag)
 {
     struct stat path_stat;
-    if( stat(src, &path_stat) == -1){
+    if( lstat(src, &path_stat) == -1){
         perror("Stat");
         return -1;
     }
 
-    if( (path_stat.st_mode & S_IFMT) == S_IFREG){
+    if( (path_stat.st_mode & S_IFMT) == S_IFLNK){ //Symbolic link
+        if(Lflag){
+            return 2;
+        }
         return 1;
     }
-    else if( (path_stat.st_mode & S_IFMT) == S_IFLNK){
+    else if( (path_stat.st_mode & S_IFMT) == S_IFREG){ //File
         return 1;
     }
-    else if( (path_stat.st_mode & S_IFMT) == S_IFDIR){
+    else if( (path_stat.st_mode & S_IFMT) == S_IFDIR){ //Directory
         return 0;
     }
     return -1;

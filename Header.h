@@ -54,6 +54,7 @@ int CopyFiles(char * src, char * dst, DIR * dir, bool Vflag, bool Dflag, bool Lf
 /* It checks if a path is a file.
  * 
  * src: source path.
+ * Lflag: flag for -l.
  *
  * Return:
  *      If the path is a symbolic link it returns 2.
@@ -61,7 +62,7 @@ int CopyFiles(char * src, char * dst, DIR * dir, bool Vflag, bool Dflag, bool Lf
  *      If the path is a directory it returns 0.
  *      In case of something going wrong it returns -1.
 */
-int FileType(char * src);
+int FileType(char * src, bool Lflag);
 
 
 /* It mimics the "cp .." command. Takes a path and takes one step back.
@@ -144,3 +145,7 @@ int SameDate(int src_fd, int dst_fd);
  *      In case of something going wrong it returns -1
 */
 int Delete(char * src, char * dst, bool Vflag);
+
+
+
+int Link(char * src, char * dst);

@@ -41,6 +41,18 @@ int DeepCopy(char * src, char * dst);
 int DeepCopyFiles(char * src, char * dst, int * copied, int * bytes);
 
 
+/* It copies all the content of the source to the destination path.
+ *
+ * src_fd: source file descriptor.
+ * dst_fd: destination file descriptor.
+ *
+ * Return:
+ *      In case of success it returns the 0.
+ *      In case of something going wrong it returns -1
+*/
+int Copy(int src_fd, int dst_fd);
+
+
 /* It copies all the files from the source path, that have changed, to the destination path.
  * 
  * src: source path.
@@ -55,64 +67,16 @@ int DeepCopyFiles(char * src, char * dst, int * copied, int * bytes);
 int CopyFiles(char * src, char * dst, int * copied, int * bytes);
 
 
-/* It checks the type of the path.
- * 
- * src: source path.
- *
- * Return:
- *      If the path is a hard link it returns 3.
- *      If the path is a symbolic link it returns 2.
- *      If the path is a file it returns 1.
- *      If the path is a directory it returns 0.
- *      In case of something going wrong it returns -1.
-*/
-int FileType(char * src);
-
-
-/* It mimics the "cp .." command. Takes a path and takes one step back.
- *
- * pth: File path that we want to change.
- *
- * Return:
- *      In case of success it returns the new path.
-*/
-char * BackTrack(char * pth);
-
-
-/* It adds to the file path, the file/directory that we want to go.
- *
- * pth: File path that we want to change.
- * Next: File or directory that we want to go to.
- *
- * Return:
- *      In case of success it returns the new path.
-*/
-char * FrontTrack(char * pth, char * Next);
-
-
-/* It copies all the content of the source to the destination path.
- *
- * src_fd: source file descriptor.
- * dst_fd: destination file descriptor.
- *
- * Return:
- *      In case of success it returns the 0.
- *      In case of something going wrong it returns -1
-*/
-int Copy(int src_fd, int dst_fd);
-
-
-/* It checks if the 2 files are equal.
- * It takes under consideration all the cases.
+/* Delete a file/directory, if it needs to be deleted.
  * 
  * src: source path.
  * dst: destination path.
  *
  * Return:
- *      If the files are equal returns the 1.
- *      If the files aren't equal returns the 0.
+ *      In case of success it returns the 0.
+ *      In case of something going wrong it returns -1
 */
-int isEqual(char * src, char * dst);
+int Delete(char * src, char * dst);
 
 
 /* It checks if the 2 files have the same size.
@@ -139,16 +103,39 @@ int EqualSize(int src_fd, int dst_fd);
 int SameDate(int src_fd, int dst_fd);
 
 
-/* Delete a file/directory, if it needs to be deleted.
- * 
- * src: source path.
- * dst: destination path.
+/* It mimics the "cp .." command. Takes a path and takes one step back.
+ *
+ * pth: File path that we want to change.
  *
  * Return:
- *      In case of success it returns the 0.
- *      In case of something going wrong it returns -1
+ *      In case of success it returns the new path.
 */
-int Delete(char * src, char * dst);
+char * BackTrack(char * pth);
+
+
+/* It adds to the file path, the file/directory that we want to go.
+ *
+ * pth: File path that we want to change.
+ * Next: File or directory that we want to go to.
+ *
+ * Return:
+ *      In case of success it returns the new path.
+*/
+char * FrontTrack(char * pth, char * Next);
+
+
+/* It checks the type of the path.
+ * 
+ * src: source path.
+ *
+ * Return:
+ *      If the path is a hard link it returns 3.
+ *      If the path is a symbolic link it returns 2.
+ *      If the path is a file it returns 1.
+ *      If the path is a directory it returns 0.
+ *      In case of something going wrong it returns -1.
+*/
+int FileType(char * src);
 
 
 /* Get the size of a given path.

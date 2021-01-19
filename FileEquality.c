@@ -79,57 +79,6 @@ int CopyFiles(char * src, char * dst, int * copied, int * bytes)
 }
 
 
-int EqualSize(int src_fd, int dst_fd)
-{
-    struct stat src_buff;
-    struct stat dst_buff;
-
-    //Take inode information for the source file
-    if (fstat(src_fd, &src_buff) == -1){
-        perror("Fstat"); return 0;
-    }
-
-    //Take inode information for the destination file
-    if (fstat(dst_fd, &dst_buff) == -1){
-        perror("Fstat"); return 0;
-    }
-
-    //Check if files are the same size
-    if (src_buff.st_size == dst_buff.st_size){
-        return 1;
-    }
-    else{
-        return 0;
-    }
-}
-
-
-int SameDate(int src_fd, int dst_fd)
-{
-    struct stat src_buff;
-    struct stat dst_buff;
-
-    //Take inode information for the source file
-    if (fstat(src_fd, &src_buff) == -1){
-        perror("Fstat"); return 1;
-    }
-
-    //Take inode information for the destination file
-    if (fstat(dst_fd, &dst_buff) == -1){
-        perror("Fstat"); return 1;
-    }
-
-    //Check if files are the same size
-    if (src_buff.st_mtime == dst_buff.st_mtime){
-        return 1;
-    }
-    else if(src_buff.st_mtime > dst_buff.st_mtime){
-        return 0;
-    }
-    return 1;
-}
-
-
 int Delete(char * src, char * dst)
 {
     DIR * dir=opendir(dst);

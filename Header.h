@@ -8,8 +8,10 @@
 # include <dirent.h>
 # include <errno.h>
 # include <stdbool.h>
+# include <time.h>
 # define nullstring " "
 
+extern bool Vflag, Dflag, Lflag;
 
 
 /* It makes a deepcopy of the source to the destination, which means that copies the cp -r command.
@@ -22,39 +24,40 @@
  *      In case of success it returns the 0.
  *      In case of something going wrong it returns -1
 */
-int DeepCopy(char * src, char * dst, bool Vflag, bool Dflag, bool Lflag);
+int DeepCopy(char * src, char * dst);
 
 
 /* It copies all the files from the source path to the destination path.
  * 
  * src: source path.
  * dst: destination path.
- * dir: Directory pointer.
+ * copied: Is a pointer to int that keeps the number of files/directories that have been copied.
+ * bytes:  Is a pointer to int that keeps the number of bytes that have been copied.
  *
  * Return:
  *      In case of success it returns the 0.
  *      In case of something going wrong it returns -1
 */
-int DeepCopyFiles(char * src, char * dst, DIR * dir, bool Vflag, bool Dflag, bool Lflag);
+int DeepCopyFiles(char * src, char * dst, int * copied, int * bytes);
 
 
 /* It copies all the files from the source path, that have changed, to the destination path.
  * 
  * src: source path.
  * dst: destination path.
- * dir: Directory pointer.
+ * copied: Is a pointer to int that keeps the number of files/directories that have been copied.
+ * bytes:  Is a pointer to int that keeps the number of bytes that have been copied.
  *
  * Return:
  *      In case of success it returns the 0.
  *      In case of something going wrong it returns -1
 */
-int CopyFiles(char * src, char * dst, DIR * dir, bool Vflag, bool Dflag, bool Lflag);
+int CopyFiles(char * src, char * dst, int * copied, int * bytes);
 
 
-/* It checks if a path is a file.
+/* It checks the type of the path.
  * 
  * src: source path.
- * Lflag: flag for -l.
  *
  * Return:
  *      If the path is a hard link it returns 3.
@@ -63,7 +66,7 @@ int CopyFiles(char * src, char * dst, DIR * dir, bool Vflag, bool Dflag, bool Lf
  *      If the path is a directory it returns 0.
  *      In case of something going wrong it returns -1.
 */
-int FileType(char * src, bool Lflag);
+int FileType(char * src);
 
 
 /* It mimics the "cp .." command. Takes a path and takes one step back.
@@ -102,14 +105,14 @@ int Copy(int src_fd, int dst_fd);
 /* It checks if the 2 files are equal.
  * It takes under consideration all the cases.
  * 
- * src_fd: file descriptor of the source file.
- * dst_fd: file descriptor of the destination file.
+ * src: source path.
+ * dst: destination path.
  *
  * Return:
  *      If the files are equal returns the 1.
  *      If the files aren't equal returns the 0.
 */
-int isEqual(char * src_fd, char * dst_fd);
+int isEqual(char * src, char * dst);
 
 
 /* It checks if the 2 files have the same size.
@@ -145,8 +148,15 @@ int SameDate(int src_fd, int dst_fd);
  *      In case of success it returns the 0.
  *      In case of something going wrong it returns -1
 */
-int Delete(char * src, char * dst, bool Vflag);
+int Delete(char * src, char * dst);
 
 
-
-int Link(char * src, char * dst);
+/* Get the size of a given path.
+ * 
+ * dst: the path that we want the size of.
+ *
+ * Return:
+ *      In case of success it returns the size of the path.
+ *      In case of something going wrong it returns -1.
+*/
+int getSize(char * dst);

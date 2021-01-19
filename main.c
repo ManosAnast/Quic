@@ -1,10 +1,9 @@
 # include "Header.h"
 
+bool Vflag=false, Dflag=false, Lflag=false;
 
 int main(int argc, char * argv[])
 {
-    bool Vflag=false, Dflag=false, Lflag=false;
-
     char * dst=(char*)calloc(2*strlen(argv[argc-1]), sizeof(char));
     char * src=(char*)calloc(2*strlen(argv[argc-2]), sizeof(char));
     strcpy(dst, argv[argc-1]); strcpy(src, argv[argc-2]);
@@ -34,22 +33,19 @@ int main(int argc, char * argv[])
     //I need to do read and write implementation
     int check;
 
-    // Check if the destination as given exists.
-    DIR * dir= opendir(dst);
-    if (errno == ENOENT){    
-        check=DeepCopy(src, dst, Vflag, Dflag, Lflag);
-    }
-    else if (errno == 0){
-        check=DeepCopy(src, dst, Vflag, Dflag, Lflag);
-    }
+    clock_t time;
+    time = clock();
+    check=DeepCopy(src, dst);
     
+    time = clock() - time;
+    double time_taken= ((double)time)/CLOCKS_PER_SEC;
 
     if(check == -1){
         printf("DeepCopy error\n"); return 1;
     }
+    printf("copied/deleted %d bytes in %fsec at %f bytes/sec\n", check, time_taken, (double)check/time_taken);
     
     free(src); free(dst);
-    free(dir);
     printf("\n");
     return 0;
 }

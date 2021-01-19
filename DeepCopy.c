@@ -1,35 +1,38 @@
 # include "Header.h"
 
-int DeepCopy(char * src, char * dst, bool Vflag, bool Dflag, bool Lflag)
+
+int DeepCopy(char * src, char * dst)
 {
-    
-    if(errno == ENOENT){
-        // Create the destination path since we enter this function if the destination path doesn't exit
-        // and add the last part of the source path, which is the file.
+    int counter, copied=0, bytes=0;
+
+    int dst_fd=open(dst, O_RDONLY);
+    if(dst_fd == -1){
         mkdir(dst, 0700);
 
         // Copy the content of the source path to the destination path
-        if (DeepCopyFiles(src, dst, opendir(src), Vflag, Dflag, Lflag) == -1){
+        if (( counter = DeepCopyFiles(src, dst, &copied, &bytes)) == -1){
             return -1;
         }
     }
-    else if (errno == 0)
-    {
-        if (CopyFiles(src, dst, opendir(src), Vflag, Dflag, Lflag) == -1){
+    else{
+        if (( counter = CopyFiles(src, dst, &copied, &bytes)) == -1){
             return -1;
         }
         if ( Dflag ){
-            if(Delete(src, dst, Vflag) == -1){
+            if(Delete(src, dst) == -1){
                 return -1;
             }
         }
     }
-    
-    return 0;
+    printf("There are %d files/directories in the hierarchy\n", counter);
+    printf("Number of entries copied is %d \n", copied);
+    return bytes;
 }
 
-int DeepCopyFiles(char * src, char * dst, DIR * dir, bool Vflag, bool Dflag, bool Lflag)
+
+int DeepCopyFiles(char * src, char * dst, int * copied, int * bytes)
 {
+    DIR * dir=opendir(src);
     if(dir == NULL){
         perror("CopyFile"); return -1;
     }
@@ -38,48 +41,60 @@ int DeepCopyFiles(char * src, char * dst, DIR * dir, bool Vflag, bool Dflag, boo
     int counter=0;
     while ( (ent = readdir(dir)) != NULL){
         if(strcmp(ent->d_name, "..") != 0 && strcmp(ent->d_name, ".") != 0 ){
-            
+            counter +=1;
             src=FrontTrack(src, ent->d_name);
             dst=FrontTrack(dst, ent->d_name);
             
-            if(Vflag){
-                printf("%s\n",src);
-            }
-
-            int Type=FileType(src, Lflag);
+            int Type=FileType(src);
             if (Type == 0){ //Directory
                 mkdir(dst, 0700);
-                if( DeepCopyFiles(src, dst, opendir(src), Vflag, Dflag, Lflag) == -1 ){
+                printf("Created directory %s\n",src);
+                if( ( counter += DeepCopyFiles(src, dst, copied, bytes) ) == -1 ){
                     return -1;
                 }
+                if(Vflag){
+                    printf("%s\n",src);
+                }
+                *bytes += getSize(dst);
             }
             else if(Type == 1){ //File
                 int src_fd=open(src, O_RDONLY);
                 int dst_fd=creat(dst, S_IRWXU);
                 Copy(src_fd, dst_fd);
+                if(Vflag){
+                    printf("%s\n",src);
+                }
+                *bytes += getSize(dst);
                 close(src_fd); close(dst_fd);
             }
             else if (Type == 2){ //Symbolic link
                 char buf[strlen(src)];
                 int result=readlink(src, buf, sizeof(buf));
-                buf[result-1]='\0';
+                buf[result]='\0';
                 if(symlink(buf, dst) == -1){
                     perror("Symlink");
                 }
+                if(Vflag){
+                    printf("%s\n",src);
+                }
+                *bytes += getSize(dst);
             }
             else if (Type == 3){ //Hard link
                 if(link(src, dst) == -1){
                     perror("Link"); 
                 }
+                if(Vflag){
+                    printf("%s\n",src);
+                }
+                *bytes += getSize(dst);
             }
             
             src=BackTrack(src);
             dst=BackTrack(dst);   
         }
     }
-    // free(src); free(dst);
-    free(dir);
-    return 0;
+    *copied = counter;
+    return counter;
 }
 
 
@@ -99,24 +114,18 @@ char * BackTrack(char * src)
 char * FrontTrack(char * src, char * Next)
 {
     int length=strlen(src);
-    // src =(char *)realloc(src, length+strlen(Next)+2);
-    // strcpy(file, src);
     if( src[length-1] != '/'){
-        // src =(char *)realloc(src, length+strlen(Next)+2);
         strcat(src, "/");
         strcat(src, Next);
     }
     else{
-        // src =(char *)realloc(src, length+strlen(Next)+1);
         strcat(src, Next);
     }
-    // strcpy(src, file);
-    // free(file);
     return src;
 }
 
 
-int FileType(char * src, bool Lflag)
+int FileType(char * src)
 {
     struct stat path_stat;
     if( lstat(src, &path_stat) == -1){
@@ -147,7 +156,7 @@ int FileType(char * src, bool Lflag)
 int Copy(int src_fd, int dst_fd)
 {
     unsigned char buffer[4096];
-    int err, n;
+    int err, n, counter =0;
     
     while (1) {
         err = read(src_fd, buffer, 4096);
@@ -156,6 +165,7 @@ int Copy(int src_fd, int dst_fd)
             exit(1);
         }
         n = err;
+        counter += n;
 
         if (n == 0) break;
 
@@ -165,5 +175,18 @@ int Copy(int src_fd, int dst_fd)
             exit(1);
         }
     }
-    return 0;
+    return counter;
+}
+
+
+int getSize(char * dst)
+{
+    int dst_fd=open(dst, O_RDONLY);
+    struct stat dst_buff;
+    
+    //Take inode information for the destination file
+    if (fstat(dst_fd, &dst_buff) == -1){
+        perror("Fstat"); return -1;
+    }
+    return dst_buff.st_size;
 }

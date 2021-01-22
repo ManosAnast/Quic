@@ -24,28 +24,25 @@ int main(int argc, char * argv[])
             else if ( !strcmp(argv[i], "-l")){
                 Lflag=true;
             }
-            
         }
-        
     }
     
 
-    //I need to do read and write implementation
-    int check;
-
     clock_t time;
     time = clock();
-    check=DeepCopy(src, dst);
+
+
+    int check=Identifier(src, dst);
     
+
     time = clock() - time;
     double time_taken= ((double)time)/CLOCKS_PER_SEC;
 
     if(check == -1){
         printf("DeepCopy error\n"); return 1;
     }
-    printf("copied/deleted %d bytes in %fsec at %f bytes/sec\n", check, time_taken, (double)check/time_taken);
+    printf("copied/deleted %d bytes in %fsec at %f bytes/sec\n\n", check, time_taken, (double)check/time_taken);
     
     free(src); free(dst);
-    printf("\n");
     return 0;
 }

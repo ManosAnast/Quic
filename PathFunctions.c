@@ -56,7 +56,7 @@ char * BackTrack(char * src)
 {
     int i, length=strlen(src);
     for (i = length; i > 0 ; i--){
-        if (src[i] == '/' && i !=length-1 ){
+        if (src[i] == '/' && i !=length-1 ){ // Find the last directory/file and remove it
             src[i+1]='\0';
             break;
         }
@@ -68,7 +68,7 @@ char * BackTrack(char * src)
 char * FrontTrack(char * src, char * Next)
 {
     int length=strlen(src);
-    if( src[length-1] != '/'){
+    if( src[length-1] != '/'){ // If the path doesn't have / at the end, add it and the add the new directory/file.
         strcat(src, "/");
         strcat(src, Next);
     }
@@ -94,7 +94,7 @@ int FileType(char * src)
         return 1;
     }
     else if( (path_stat.st_mode & S_IFMT) == S_IFREG){ //File
-        if (path_stat.st_nlink > 1 && Lflag){
+        if (path_stat.st_nlink > 1 && Lflag){ // If num of hard links > 1 => file is hard link.
             return 3;
         }
         

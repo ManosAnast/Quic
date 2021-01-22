@@ -1,7 +1,7 @@
 # include "Header.h"
 
 
-int DeepCopy(char * src, char * dst)
+int Identifier(char * src, char * dst)
 {
     int counter, copied=0, bytes=0;
 
@@ -10,12 +10,12 @@ int DeepCopy(char * src, char * dst)
         mkdir(dst, 0700);
 
         // Copy the content of the source path to the destination path
-        if (( counter = DeepCopyFiles(src, dst, &copied, &bytes)) == -1){
+        if (( counter = DeepCopy(src, dst, &copied, &bytes)) == -1){
             return -1;
         }
     }
     else{
-        if (( counter = CopyFiles(src, dst, &copied, &bytes)) == -1){
+        if (( counter = UpdateFiles(src, dst, &copied, &bytes)) == -1){
             return -1;
         }
         if ( Dflag ){
@@ -30,7 +30,7 @@ int DeepCopy(char * src, char * dst)
 }
 
 
-int DeepCopyFiles(char * src, char * dst, int * copied, int * bytes)
+int DeepCopy(char * src, char * dst, int * copied, int * bytes)
 {
     DIR * dir=opendir(src);
     if(dir == NULL){
@@ -49,7 +49,7 @@ int DeepCopyFiles(char * src, char * dst, int * copied, int * bytes)
             if (Type == 0){ //Directory
                 mkdir(dst, 0700);
                 printf("Created directory %s\n",src);
-                if( ( counter += DeepCopyFiles(src, dst, copied, bytes) ) == -1 ){
+                if( ( counter += DeepCopy(src, dst, copied, bytes) ) == -1 ){ 
                     return -1;
                 }
                 if(Vflag){
@@ -60,7 +60,9 @@ int DeepCopyFiles(char * src, char * dst, int * copied, int * bytes)
             else if(Type == 1){ //File
                 int src_fd=open(src, O_RDONLY);
                 int dst_fd=creat(dst, S_IRWXU);
-                Copy(src_fd, dst_fd);
+                if(Copy(src_fd, dst_fd) == -1){
+                    return -1;
+                }
                 if(Vflag){
                     printf("%s\n",src);
                 }
@@ -107,7 +109,7 @@ int Copy(int src_fd, int dst_fd)
         err = read(src_fd, buffer, 4096);
         if (err == -1) {
             printf("Error reading file.\n");
-            exit(1);
+            return -1;
         }
         n = err;
         counter += n;
@@ -117,7 +119,7 @@ int Copy(int src_fd, int dst_fd)
         err = write(dst_fd, buffer, n);
         if (err == -1) {
             printf("Error writing to file.\n");
-            exit(1);
+            return -1;
         }
     }
     return counter;

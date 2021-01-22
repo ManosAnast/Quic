@@ -1,7 +1,7 @@
 # include "Header.h"
 
 
-int CopyFiles(char * src, char * dst, int * copied, int * bytes)
+int UpdateFiles(char * src, char * dst, int * copied, int * bytes)
 {
     DIR * dir=opendir(src);
     if(dir == NULL){
@@ -22,14 +22,14 @@ int CopyFiles(char * src, char * dst, int * copied, int * bytes)
                 if(dst_fd == -1){
                     mkdir(dst, 0700);
                     printf("Created directory %s\n",src);
-                    if ((counter += DeepCopyFiles(src, dst, copied, bytes)) == -1){
+                    if ((counter += DeepCopy(src, dst, copied, bytes)) == -1){
                         return -1;
                     }
                     *copied += 1;
                 }
                 else
                 {
-                    if ((counter += CopyFiles(src, dst, copied, bytes)) == -1){
+                    if ((counter += UpdateFiles(src, dst, copied, bytes)) == -1){
                         return -1;
                     }
                 }
@@ -45,7 +45,10 @@ int CopyFiles(char * src, char * dst, int * copied, int * bytes)
                     if(Vflag){
                         printf("%s\n",src);
                     }
-                    *bytes += Copy(src_fd, dst_fd);
+                    if(Copy(src_fd, dst_fd) == -1){
+                        return -1;
+                    }
+                    *bytes += getSize(dst);
                     *copied += 1;
                 }
                 close(src_fd); close(dst_fd);
@@ -126,7 +129,7 @@ int Delete(char * src, char * dst)
                         perror("Unlink"); return -1;
                     }
                     if(Vflag){
-                        printf("unlink Delete: %s\n",dst);
+                        printf("Delete: %s\n",dst);
                     }
                 }
             }

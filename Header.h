@@ -24,7 +24,7 @@ extern bool Vflag, Dflag, Lflag;
  *      In case of success it returns the 0.
  *      In case of something going wrong it returns -1
 */
-int DeepCopy(char * src, char * dst);
+int Identifier(char * src, char * dst);
 
 
 /* It copies all the files from the source path to the destination path.
@@ -38,7 +38,7 @@ int DeepCopy(char * src, char * dst);
  *      In case of success it returns the 0.
  *      In case of something going wrong it returns -1
 */
-int DeepCopyFiles(char * src, char * dst, int * copied, int * bytes);
+int DeepCopy(char * src, char * dst, int * copied, int * bytes);
 
 
 /* It copies all the content of the source to the destination path.
@@ -64,7 +64,7 @@ int Copy(int src_fd, int dst_fd);
  *      In case of success it returns the 0.
  *      In case of something going wrong it returns -1
 */
-int CopyFiles(char * src, char * dst, int * copied, int * bytes);
+int UpdateFiles(char * src, char * dst, int * copied, int * bytes);
 
 
 /* Delete a file/directory, if it needs to be deleted.

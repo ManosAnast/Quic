@@ -1,7 +1,26 @@
-# Στόχος:
-Είναι ένα πρόγραμμα που να ‘αντιγράφει γρήγορα’ ιεραρχίες
-καταλόγων/αρχείων όταν κάτι τέτοιο γίνεται κατ΄ επανάληψη. Το πρόγραμμα αυτό λέγεται quick incremental
-copy ή απλά quic. 
+# Goal:
+Quic is a program that copies directories when the copy is repeated. It is called quick incremental copy, in simple terms quic.
+
+# Program call:
+First compile the code with:
+make
+
+Then, the program is called with this format:
+./quic -v -d -l origindir destdir όπου
+– quick ,
+
+– origindir is the source path. 
+
+– destdir is the destination path.
+
+
+– Flags:
+  -v (verbose) when this flag is given, prints the choices/actions that the program makes for the copy/delete of the files.
+
+  -d (deleted) when this flag is given, delete the files from the destdir that have been deleted from the origindir.
+
+  -l (links) when this flag is given, the program takes under cosideration if a file is a link, otherwise it treats it as a file.
+
 
 # Κανόνες:
 -Το quic θα πρέπει να δέχεται δύο ορίσματα στη γραμμή εντολών: τον κατάλογο που θα πρέπει να αντιγραφεί
@@ -43,21 +62,6 @@ copy ή απλά quic.
 Για παράδειγμα αν τα i-nodes α1 και α2 αναφέρονται στο ίδιο αρχείο, το αντίγραφο θα πρέπει να έχει κόμβους
 τ1 και τ2 οι οποίοι όμως θα αναφέρονται στα ίδια μπλοκς αρχείου.
 
-# Κλήση προγράμματος:
-Το πρόγραμμα σας θα μπορούσε να κληθεί ως εξής:
-./quic -v -d -l origindir destdir όπου
-– quick είναι το εκτελέσιμο,
-
-– origindir ο αρχικός κατάλογος και destdir ο κατάλογος προορισμού.
-
-– η σημαία -v (verbose) παρέχει την εκτύπωση διαγνωστικών για τις επιλογές/ενέργειες του προγράμματος
-όσον αφορά στην αντιγραφή/διαγραφή αρχείων.
-
-– η σημαία -d (deleted) προσδιορίζει οτι στοιχεία του συστήματος αρχείου που έχουν διαγραφεί απο τον
-αρχικό κατάλογο origindir δεν θα πρέπει να υπάρχουν στο κατάλογο προορισμού destdir.
-
-– η σημαία -l (links) καθορίζει εάν το πρόγραμμα σας λαμβάνει υπ΄ όψη και την διαχείριση των πιθανών
-συνδέσμων.
 
 ΄Εχετε την δυνατότητα να προσθέσετε οποιαδήποτε άλλη σημαία κρίνετε απαραίτητη.
 Στο τέλος το πρόγραμμα σας θα πρέπει να παρέχει κάποια βασικά χαρακτηριστικά όσον αφορά την συμπεριφορά

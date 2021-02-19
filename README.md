@@ -2,24 +2,24 @@
 Quic is a program that copies directories when the copy is repeated. It is called quick incremental copy, in simple terms quic.
 
 # Program call:
-First compile the code with:
-make
+  First compile the code with:
+  make
 
-Then, the program is called with this format:
-./quic -v -d -l origindir destdir όπου
-– quick ,
+  Then, the program is called with this format:
+  ./quic -v -d -l origindir destdir όπου
+  – quick ,
 
-– origindir is the source path. 
+  – origindir is the source path. 
 
-– destdir is the destination path.
+  – destdir is the destination path.
 
 
-– Flags:
-  -v (verbose) when this flag is given, prints the choices/actions that the program makes for the copy/delete of the files.
+  – Flags:
+    -v (verbose) when this flag is given, prints the choices/actions that the program makes for the copy/delete of the files.
 
-  -d (deleted) when this flag is given, delete the files from the destdir that have been deleted from the origindir.
+    -d (deleted) when this flag is given, delete the files from the destdir that have been deleted from the origindir.
 
-  -l (links) when this flag is given, the program takes under cosideration if a file is a link, otherwise it treats it as a file.
+    -l (links) when this flag is given, the program takes under cosideration if a file is a link, otherwise it treats it as a file.
 
 
 # Κανόνες:

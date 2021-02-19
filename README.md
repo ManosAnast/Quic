@@ -3,18 +3,22 @@ Quic is a program that copies directories when the copy is repeated. It is calle
 
 # Program call:
   First compile the code with:
-  make
+    
+    make
 
   Then, the program is called with this format:
-  ./quic -v -d -l origindir destdir όπου
-  – quick ,
+    
+    ./quic -v -d -l origindir destdir όπου
 
-  – origindir is the source path. 
+    – quick ,
 
-  – destdir is the destination path.
+    – origindir is the source path. 
+
+    – destdir is the destination path.
 
 
   – Flags:
+  
     -v (verbose) when this flag is given, prints the choices/actions that the program makes for the copy/delete of the files.
 
     -d (deleted) when this flag is given, delete the files from the destdir that have been deleted from the origindir.

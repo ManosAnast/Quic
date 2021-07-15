@@ -1,5 +1,6 @@
 # Goal:
 Quic is a program that copies directories when the copy is repeated. It is called quick incremental copy, in simple terms quic.
+It does the same job as the cp command with the difference that it checks if the files that you want to copy at a specified directory have already been copied.
 
 # Program call:
   First compile the code with:
@@ -26,51 +27,32 @@ Quic is a program that copies directories when the copy is repeated. It is calle
     -l (links) when this flag is given, the program takes under cosideration if a file is a link, otherwise it treats it as a file.
 
 
-# Κανόνες:
--Το quic θα πρέπει να δέχεται δύο ορίσματα στη γραμμή εντολών: τον κατάλογο που θα πρέπει να αντιγραφεί
-(δηλ. κατάλογος προέλευσης) και τον κατάλογο προορισμού. Αν τα ορίσματα δεν δοθούν ορθά, το πρόγραμμα
-σας θα πρέπει να παράγει κάποιο μήνυμα λάθους. Αν ο κατάλογος προορισμού δεν υπάρχει, θα πρέπει να τον
-δημιουργήσετε.
+# Rules:
+-There must be 2 arguments: the directory that is going to be copied
+(source directory) and the destination directory. If the arguments are not correct, the program prints an error. 
+If the destination directory doesn't exist, the program creates it.
 
--Ας θεωρήσουμε ότι ένας αρχικός κατάλογος είναι ο Α και ο κατάλογος τελικού προορισμού είναι ο Τ. Το
-πρόγραμμα θα πρέπει να διατρέχει τον Α, να διαβάζει πληροφορίες που υπάρχουν στα εκεί i-nodes και για
-κάθε α i-node στον Α θα πρέπει να αναζητείτε το αντίστοιχο τ i-node στο Τ (που βρίσκεται στο ίδιο σχετικό
-μονοπάτι). Διακρίνουμε 4 περιπτώσεις:
-1. Το τ δεν υπάρχει στο Τ: σε αυτή την περίπτωση το τ θα πρέπει να δημιουργηθεί στην σωστή θέση του
-Τ και να αντιγραφεί το α στο τ. Αν το i-node αναφέρεται σε αρχείο, θα πρέπει να αντιγραφούν και τα
-δεδομένα του αρχείου.
-2. Το τ υπάρχει στο Τ αλλά δεν είναι ΙΔΙΟ με το α στο κατάλογο Α: εδώ θα πρέπει να ορίσουμε τι είναι το
-«ΙΔΙΟ» πράγμα που κάνουμε παρακάτω. Στην περίπτωση αυτή, πρέπει το περιεχόμενο του α i-node να
-αντιγραφεί στο τ. Αν τα i-nodes α και τ έχουν να κάνουν με αρχεία πρέπει στην αντιγραφή να περιληφθούν
-και τα δεδομένα αρχείων.
-3. Το τ υπάρχει στο Τ και είναι το ίδιο με το α στο Α: σε αυτή την περίπτωση δεν χρειάζεται να γίνει κάτι.
-Είναι η περίπτωση που το quic κερδίζει σε σχέση με το παραδοσιακό cp.
-4. Εάν υπάρχει ένα τ στο Τ που δεν έχει αντίστοιχο στο α στο κατάλογο Α: αυτή είναι η περίπτωση που
-κάποιο στοιχείο έχει διαγραφεί. Συνεπώς ο κατάλογος Τ θα πρέπει να καθαριστεί από το τ (διαγραφή).
-΄Οταν τα i-nodes, α και τ αντιστοιχούν σε καταλόγους τα παραπάνω βήματα θα πρέπει να εφαρμοστούν αναδρομικά ώστε και τα υποκείμενα στοιχεία των καταλόγων να ελεγχθούν ενδελεχώς.
+-Lets assume that there is a source directory A and a destination directory T. The
+program traverse A, gets informations at the i-nodes and for every a i-node at the A, it searches for a t i-node at the T. 
+There are 4 cases:
+1. There is no t at the T: t should be created at the correct T position and copies a to t.
+If i-node corresponds to a file, the file data should be copied too.
+2. t exist at the T but is not the same with a at the A directory. See below for «same» explantion.
+In this case, the content of the a i-node should be copied at the t. If the a i-nodes and t are files, their data should be copied too.
+3. t exist at the T and is the same as a at A: In this case the program exits.
+This is the case that quic is faster than cp.
+4. t exist at the T but it doesn't correspond to any a from the A directory: This is the case that a file has been deleted. 
+ Therefore, t is getting deleted.
+ If the i-nodes, a and t, corresponds to directories, the previous steps should be implemented recursively.
 
-# Ίδια αρχεία:
-1. αν από τα α και τ, το ένα αντιστοιχεί σε αρχείο και το άλλο σε κατάλογο, τότε προφανώς έχουμε διαφορά.
-2. αν τα α και τ αναφέρονται σε καταλόγους, τότε θεωρούνται ίδια χωρίς όμως αυτό να σημαίνει και τα
-περιεχόμενα των καταλόγων είναι ίδια. Για να αποφασίσουμε κάτι τέτοιο, τα επιμέρους περιεχόμενα θα
-πρέπει να ελεγχθούν αναδρομικά.
-3. αν τα α και τ αναφέρονται σε αρχεία που έχουν διαφορετικό μέγεθος, είναι προφανές ότι τα εν λόγω αρχεία
-είναι ανόμοια.
-4. αν τα α και τ αναφέρονται σε αρχεία που έχουν το ίδιο μέγεθος αλλά το τ έχει ημερομηνία τροποποίησης
-πριν την ημερομηνία του α τότε τα α και τ δεν είναι ίδια.
-5. σε οποιαδήποτε άλλη περίπτωση, τα αρχεία με i-nodes α και τ θεωρούνται «ίδια».
+# Same Files:
+1. If one of a and t corresponds to a directory and the other to a file, then they are not same.
+2. If both a and t corresponds to a directory, we assume that a and t are tha same but this doesn't mean that their directory content is the same. 
+In order to find out if their content is the same, their individual contents should be check recursively.
+3. If both a and t corresponds to files but their size is different, the files are different.
+4. If both a and t corresponds to files with the same size but t has been modified before a has, then they are different.
+5. In any other case, the files are the same.
 
-Οι συμβολικοί σύνδεσμοι (soft links) θα πρέπει στο αντίγραφο να
-αναφέρονται στο ίδιο μονοπάτι. Το μονοπάτι αυτό μπορεί να είναι είτε απόλυτο είτε σχετικό. Στην περίπτωση
-των ισχυρών δεσμών (hard links) πρέπει τα δεδομένα των αρχείων να μην αντιγράφονται πάνω από μία φορά.
-Για παράδειγμα αν τα i-nodes α1 και α2 αναφέρονται στο ίδιο αρχείο, το αντίγραφο θα πρέπει να έχει κόμβους
-τ1 και τ2 οι οποίοι όμως θα αναφέρονται στα ίδια μπλοκς αρχείου.
-
-
-΄Εχετε την δυνατότητα να προσθέσετε οποιαδήποτε άλλη σημαία κρίνετε απαραίτητη.
-Στο τέλος το πρόγραμμα σας θα πρέπει να παρέχει κάποια βασικά χαρακτηριστικά όσον αφορά την συμπεριφορά
-του όπως:
-1. αριθμό οντοτήτων (αρχεία, καταλόγους και πιθανώς συνδέσμους) που το πρόγραμμα έχει «δει» στην
-συγκεκριμένη εκτέλεσή του,
-2. αριθμό από τις παραπάνω οντότητες που τελικά αντιγράφησαν,
-3. των αριθμό των bytes που αντιγράφησαν συνολικά, χρόνος που απαιτήθηκε για την εργασία του προγράμματος και το ρυθμό με τον οποίο γράφτηκαν τα παραπάνω bytes στο κατάλογου προορισμού.
+Soft links should refer at the same path. 
+For hard links, their data shouldn't be copied more than once.
+For example, if the i-nodes a1 and a2 refer to the same file, the copy must have t1 and t2 nodes that refer to the same file blocks.
